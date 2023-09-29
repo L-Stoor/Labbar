@@ -16,8 +16,8 @@ class Student:
         
     def __str__(self):
         """ __str__ formulerar hur vår utskrift kommer att se ut när den printas. """
-        
-        return "Namn: " + str(self.förnamn) + " " + str(self.efternamn) + " Personnummer: " + str(self.personnummer)
+
+        return "Namn: " + self.förnamn + " " + self.efternamn + " Personnummer: " + str(self.personnummer)
 
 
 def main(): # Taget från OLI sidorna
