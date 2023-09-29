@@ -7,8 +7,8 @@ def bokstav(prompt):
     while True:
         try:
             tecken = input(prompt)
-            if tecken.isalpha() == False:    
-                raise ValueError
+            if tecken.isalpha() == False: #Jämför tecken mot True/False
+                raise ValueError # Vi säger att False ska ge ValueError
             else:
                 return tecken
         except ValueError:
