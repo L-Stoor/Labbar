@@ -7,7 +7,7 @@ def bokstav(prompt):
     while True:
         try:
             tecken = input(prompt)
-            if not tecken.isalpha() == True:    
+            if tecken.isalpha() == False:    
                 raise ValueError
             else:
                 return tecken
