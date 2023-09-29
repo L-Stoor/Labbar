@@ -1,4 +1,4 @@
-
+"""Denna fil importeras senare in till vårt huvudprogram i en annan fil"""
 
 def bokstav(prompt):
     """ Felhanteringen kommer att sköta alla inmatningsfel användaren gör under förnamn och eftternamn.
@@ -12,7 +12,7 @@ def bokstav(prompt):
             else:
                 return tecken
         except ValueError:
-            print("Får bara vara bokstäver :) ")
+            print("Namnet får bara innehålla bokstäver :) ")
 
 
 def siffra(prompt):
