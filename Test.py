@@ -2,7 +2,6 @@ import hanteralabb
 """ Importerar vår felhanterings kod som hanterar vår input i koden """
 
 
-   
 def läsa_fil():
     """ Skapar en funktion som ska öppna och läsa innehållet i en fil och lägga in informationen i en lista """
 
