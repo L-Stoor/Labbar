@@ -1,4 +1,4 @@
-"""Denna fil importeras senare in till vårt huvudprogram i en annan fil"""
+"""Denna fil importeras senare in till vårt huvudprogram"""
 
 def lista(prompt):
 
@@ -10,4 +10,4 @@ def lista(prompt):
             else:
                 return open("students.txt", "r")
         except FileNotFoundError:
-            print("Den filen finns inte. Skriv in ny fil. ")
+            print("Filen kunde inte hittas, skriv in ny fil. ")
