@@ -9,6 +9,6 @@ def lista(prompt):
             if fil != "students.txt":
                 print("Den filen finns inte. Skriv in ny fil. ")
             else:
-                return open("students.txt", "r", encoding = "utf-8")
+                return open("students.txt", "r", encoding = "utf-8") # utf-8 gör att python kan läsa ÅÄÖ
         except FileNotFoundError:
             print("Filen kunde inte hittas, skriv in ny fil. ")
