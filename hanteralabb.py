@@ -1,7 +1,7 @@
 """Denna fil importeras senare in till vårt huvudprogram"""
 
 def lista(prompt):
-    """ Vår felhantering så användaren inte anger fel filnamn """
+    """ Vår felhantering så användaren inte anger fel filnamn, godtar bara "students.txt" """
 
     while True:
         try:
