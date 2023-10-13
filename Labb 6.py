@@ -5,7 +5,7 @@ import hanteralabb
 def läsa_fil():
     """ Skapar en funktion som ska öppna och läsa innehållet i en fil och lägga in informationen i en lista """
 
-    inmatning = hanteralabb.lista("Vad heter filen? ")
+    hanteralabb.lista("Vad heter filen? ")
     fil = open("students.txt", "r", encoding = "utf-8") # utf-8 gör att python kan läsa ÅÄÖ
     lista = []
 
