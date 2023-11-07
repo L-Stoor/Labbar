@@ -1,0 +1,84 @@
+""" Importerar vår fil med filhantering för namn och personnummer """
+import felhantering
+
+
+class Student:
+    """ Introducerar en class. Student. där man kan spara förnamn, efternamn och personnummer i de tre
+    attributerna. Denna klass hanterar informationen från filen"""
+
+    def __init__(self, förnamn, efternamn, personnummer):
+        """ En metod för att skapa en lista med de tre attributen från listan """
+        
+        self.personnummer = personnummer
+        self.efternamn = efternamn
+        self.förnamn = förnamn
+
+    def __str__(self):
+        """ __str__ formulerar hur vår utskrift kommer att se ut när den printas. """
+
+        return "Namn: " + self.förnamn + " " + self.efternamn + " Personnummer: " + str(self.personnummer)
+
+def main():
+    """ Skapar en lista där studenter sedan lagras från en fil
+    som användaren frågas att öppna """
+
+    studentlista = []
+    fil = felhantering.lista("Vad heter filen? ")
+    
+    for n in range(6):  # Det är antalet studenter som finns i listan "students.txt"
+        
+        personnummer = int(fil.readline().strip())
+        efternamn = fil.readline().strip()
+        förnamn = fil.readline().strip()
+        
+        student = Student(förnamn, efternamn, personnummer)  # Här skapas "studenten"
+        studentlista.append(student)
+
+    fil.close()  # Stänger filen efter användning
+
+    for student in studentlista:
+        print(student)
+
+
+
+
+
+class School:
+    """ Introducerar en class. Student. där man kan spara förnamn, efternamn och personnummer i de tre
+    attributerna. Denna klass hanterar informationen som användaren anger """
+
+    def __init__(self, förnamn, efternamn, personnummer):
+        """ En metod för att skapa en lista med de tre attributen från användaren """
+
+        self.förnamn = förnamn
+        self.efternamn = efternamn
+        self.personnummer = personnummer
+            
+
+    def __str__(self):
+        """ __str__ formulerar hur vår utskrift kommer att se ut när den printas. """
+
+        return "Namn: " + self.förnamn + " " + self.efternamn + " Personnummer: " + str(self.personnummer)
+    
+def skola():
+    """ En funktion som skapar en lista 'elevlista' baserat på användaren inmatning """
+
+    elevlista = []
+    
+    for n in range(3): # 3 är antalet studenter som ska skapas
+
+        förnamn = felhantering.bokstav("Vad är studentens förnamn? ")
+        efternamn = felhantering.bokstav("Vad är studentens efternamn? ")
+        personnummer = felhantering.siffra("Vad är studentens personnummer? ")
+
+        elev = School(förnamn, efternamn, personnummer) # Här skapas "eleven"
+        elevlista.append(elev)
+
+    print("Här är alla sparade objekt:")
+
+    for elev in elevlista:
+        print(elev)
+    
+
+main()
+skola()
