@@ -1,0 +1,56 @@
+"""Labb 6"""
+
+class Student:
+    """ Introducerar en class, Student. där man kan spara förnamn, efternamn och personnummer i de tre
+    attributerna."""
+
+    def __init__(self, förnamn, efternamn, personnummer):
+        self.personnummer = personnummer
+        self.efternamn = efternamn
+        self.förnamn = förnamn
+
+    def __str__(self):
+        """ __str__ formulerar hur vår utskrift kommer att se ut när den printas. """
+        
+        return "Namn: " + self.förnamn + " " + self.efternamn + " Personnummer: " + str(self.personnummer)
+
+class Skola:
+    """Klass som fylls med information från fil om studenter på KTH"""
+
+    def __init__(self, filnamn):
+        self.filnamn = filnamn
+        self.studenter = []
+        self.läsafil()
+
+    def läsafil(self):
+        """"Här läses filen in och lägger till förnamn, efternamn och personnummer i listan"""
+
+        with open(self.filnamn, "r", encoding="utf-8") as fil:
+
+            for n in range(6): # Det är antalet studenter som finns i listan "students.txt"
+
+                personnummer = fil.readline().strip()
+                förnamn = fil.readline().strip()
+                efternamn = fil.readline().strip()
+                self.studenter.append(Student(förnamn, efternamn, personnummer))
+
+def skriv_studenter(studenter):
+    """Funktion som printar ut alla objekt i listan med referens till __Str__ """
+
+    print("Dessa studenter finns på KTH")
+    for student in studenter: # Printar alla objekten i listan, self.studenter
+        print(student)
+
+def main():
+    """Main funktionen kallar på klassen, Skola och "startar" koden"""
+
+    while True:
+        try:
+            filnamn = input("Vad heter filen? ")
+            skola = Skola(filnamn)
+            skriv_studenter(skola.studenter)
+            break
+        except FileNotFoundError:
+            print("Filen kunde inte hittas, skriv in ny fil. ")
+
+main()
