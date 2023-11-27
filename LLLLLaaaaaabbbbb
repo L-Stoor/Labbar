@@ -1,43 +1,131 @@
-""" Importerar vår fil med filhantering för namn och personnummer """
-import hanteralabb
+class Person:
 
-
-class Student:
-    """ Introducerar en class. Student. där man kan spara förnamn, efternamn och personnummer i de tre
-    attributerna. """
-
-    def __init__(self, förnamn, efternamn, personnummer):
-        """ Skapar en funktion som ska öppna och läsa innehållet 
-        i en fil och lägga in informationen i en lista """
-        
-        self.personnummer = personnummer
-        self.efternamn = efternamn
+    def __init__(self, förnamn, efternamn, telefonnummer, mail, adress):
         self.förnamn = förnamn
+        self.efternamn = efternamn
+        self.telefonnummer = telefonnummer
+        self.mail = mail
+        self.adress = adress
 
     def __str__(self):
-        """ __str__ formulerar hur vår utskrift kommer att se ut när den printas. """
+        return f"{self.förnamn} {self.efternamn} {self.telefonnummer} {self.mail} {self.adress}"
 
-        return "Namn: " + self.förnamn + " " + self.efternamn + " Personnummer: " + str(self.personnummer)
+class Register:
+
+    def __init__(self, filnamn):
+        self.filnamn = filnamn
+        self.personer = []  # Skapar en tom lista
+        self.läsafil()
+
+    def läsafil(self):
+
+        with open(self.filnamn, "r", encoding="utf-8") as fil:
+            for line in fil:
+                line = line.strip().split(";")
+
+                if len(line) == 5:
+                    förnamn, efternamn, telefonnummer, mail, adress = [info.strip() for info in line]
+                    person = Person(förnamn, efternamn, telefonnummer, mail, adress)
+                    self.personer.append(person)
+
+def skriv_studenter(personer):
+
+    sorterad_lista = sorted(personer, key=lambda person: person.förnamn)
+    for person in sorterad_lista:
+        print(person)
+
+def sök_personer(personer, sökterm):
+
+    sökterm = sökterm.lower()
+    samma_personer = []
+
+    for person in personer:
+        samma_förnamn = sökterm in person.förnamn.lower()
+        samma_efternamn = sökterm in person.efternamn.lower()
+        samma_telefonnummer = sökterm in person.telefonnummer
+        samma_mail = sökterm in person.mail.lower()
+
+        if samma_förnamn or samma_efternamn or samma_telefonnummer or samma_mail:
+            samma_personer.append(person)
+
+    for person in samma_personer:
+        print(person)
+
+    return samma_personer
+
+def ändra_uppgifter(personer):
+    förnamn = input("Ange förnamn för personen vars uppgifter du vill ändra: ")
+    efternamn = input("Ange efternamn för personen vars uppgifter du vill ändra: ")
+
+    samma_personer = sök_personer(personer, förnamn + " " + efternamn)
+
+    for person in samma_personer:
+        print(person)
+
+    if not samma_personer:
+        print("Ingen person som matchade din inmatning finns.")
+        return
+
+    vald_person = samma_personer[0]
+
+    print(f"Vad vill du ändra för {vald_person.förnamn} {vald_person.efternamn}?\n"
+          "1. Förnamn   2. Efternamn   3. Telefonnummer   4. Mail   5. Adress")
+
+    val = input("Ange en siffra 1 - 5: ")
+
+    if val == 'q':
+        print("Avbruten.")
+        return
+
+    try:
+        val = int(val)
+        if 1 <= val <= 5:
+            ny_information = input(f"Ange ny information för {vald_person}: ")
+
+            if val == 1:
+                vald_person.förnamn = ny_information
+            elif val == 2:
+                vald_person.efternamn = ny_information
+            elif val == 3:
+                vald_person.telefonnummer = ny_information
+            elif val == 4:
+                vald_person.mail = ny_information
+            elif val == 5:
+                vald_person.adress = ny_information
+            else:
+                print("Ogiltigt val.")
+                return
+        else:
+            print("Ogiltigt val.")
+            return
+    except ValueError:
+        print("Ogiltigt val.")
+        return
+
+    with open("Register.txt", "w", encoding="utf-8") as fil:
+        for person in personer:
+            fil.write(f"{person.förnamn};{person.efternamn};{person.telefonnummer};{person.mail};{person.adress}\n")
+
+    print("Information har ändrats.")
 
 def main():
-    """ Skapar en lista där studenter sedan lagras från en fil
-    som användaren frågas att öppna """
 
-    studentlista = []
-    fil = hanteralabb.lista("Vad heter filen? ")
-    
-    for n in range(6):  # Det är antalet studenter som finns i listan "students.txt"
-        
-        personnummer = int(fil.readline().strip())
-        efternamn = fil.readline().strip()
-        förnamn = fil.readline().strip()
-        
-        student = Student(förnamn, efternamn, personnummer)  # Här skapas "studenten"
-        studentlista.append(student)
+    start = Register(input("Vad heter filen?: "))
+    print("Vad vill du göra?")
+    val = input("1. Sök person  2. Skriv ut lista   3. Ändra uppgifter")
 
-    fil.close()  # Stänger filen efter användning
+    if val == "1":
+        sök_personer(start.personer)
 
-    for student in studentlista:
-        print(student)
+    elif val == "2":
+        skriv_studenter(start.personer)
 
-main()
+    elif val == "3":
+        ändra_uppgifter(start.personer)
+
+
+    else:
+        print("Hej då!")
+
+if __name__ == "__main__":
+    main()
