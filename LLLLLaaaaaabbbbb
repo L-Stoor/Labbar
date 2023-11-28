@@ -1,4 +1,7 @@
+import felhantering
+
 class Person:
+    header_printed = False
 
     def __init__(self, förnamn, efternamn, telefonnummer, mail, adress):
         self.förnamn = förnamn
@@ -8,34 +11,36 @@ class Person:
         self.adress = adress
 
     def __str__(self):
-        return f"{self.förnamn} {self.efternamn} {self.telefonnummer} {self.mail} {self.adress}"
+        if not Person.header_printed:
+            header = f"{'Förnamn':<15} {'Efternamn':<15} {'Telefonnummer':<15} {'Email':<30} {'Adress':<15}"
+            separator = "=" * 90
+            Person.header_printed = True
+            return f"{header}\n{separator}\n{self.förnamn:<15} {self.efternamn:<15} {self.telefonnummer:<15} {self.mail:<30} {self.adress:<15}"
+        else:
+            return f"{self.förnamn:<15} {self.efternamn:<15} {self.telefonnummer:<15} {self.mail:<30} {self.adress:<15}"
 
 class Register:
-
     def __init__(self, filnamn):
         self.filnamn = filnamn
         self.personer = []  # Skapar en tom lista
         self.läsafil()
 
     def läsafil(self):
-
         with open(self.filnamn, "r", encoding="utf-8") as fil:
             for line in fil:
                 line = line.strip().split(";")
-
                 if len(line) == 5:
                     förnamn, efternamn, telefonnummer, mail, adress = [info.strip() for info in line]
                     person = Person(förnamn, efternamn, telefonnummer, mail, adress)
                     self.personer.append(person)
 
 def skriv_studenter(personer):
-
     sorterad_lista = sorted(personer, key=lambda person: person.förnamn)
     for person in sorterad_lista:
         print(person)
 
 def sök_personer(personer, sökterm):
-
+    
     sökterm = sökterm.lower()
     samma_personer = []
 
@@ -53,40 +58,38 @@ def sök_personer(personer, sökterm):
 
     return samma_personer
 
-def ändra_uppgifter(personer):
-    förnamn = input("Ange förnamn för personen vars uppgifter du vill ändra: ")
-    efternamn = input("Ange efternamn för personen vars uppgifter du vill ändra: ")
+def ändra_uppgifter(register):
+    förnamn = felhantering.bokstav("Ange förnamn på personem: ")
+    efternamn = felhantering.bokstav("Ange efternamn på personen: ")
 
-    samma_personer = sök_personer(personer, förnamn + " " + efternamn)
+    vald_person = None
 
-    for person in samma_personer:
-        print(person)
+    for person in register.personer:
+        if person.förnamn.lower() == förnamn.lower() and person.efternamn.lower() == efternamn.lower():
+            vald_person = person
+            break
 
-    if not samma_personer:
+    if vald_person is None:
         print("Ingen person som matchade din inmatning finns.")
         return
 
-    vald_person = samma_personer[0]
-
-    print(f"Vad vill du ändra för {vald_person.förnamn} {vald_person.efternamn}?\n"
+    print("Vad vill du ändra?:\n"
           "1. Förnamn   2. Efternamn   3. Telefonnummer   4. Mail   5. Adress")
 
     val = input("Ange en siffra 1 - 5: ")
 
-    if val == 'q':
-        print("Avbruten.")
-        return
-
     try:
         val = int(val)
         if 1 <= val <= 5:
-            ny_information = input(f"Ange ny information för {vald_person}: ")
+            ny_information = input("Uppdatera informationen: ")
 
             if val == 1:
-                vald_person.förnamn = ny_information
+                vald_person.förnamn = ny_information.title() # Hittade .title() functionen på youtube
             elif val == 2:
-                vald_person.efternamn = ny_information
+                vald_person.efternamn = ny_information.title()
             elif val == 3:
+                ny_information = ny_information.replace("-", "")
+                ny_information = ny_information[:3] + '-' + ny_information[3:]
                 vald_person.telefonnummer = ny_information
             elif val == 4:
                 vald_person.mail = ny_information
@@ -101,31 +104,101 @@ def ändra_uppgifter(personer):
     except ValueError:
         print("Ogiltigt val.")
         return
-
+    
     with open("Register.txt", "w", encoding="utf-8") as fil:
-        for person in personer:
+        for person in register.personer:
             fil.write(f"{person.förnamn};{person.efternamn};{person.telefonnummer};{person.mail};{person.adress}\n")
 
     print("Information har ändrats.")
 
-def main():
+def lägga_till_personer(personer):
 
-    start = Register(input("Vad heter filen?: "))
-    print("Vad vill du göra?")
-    val = input("1. Sök person  2. Skriv ut lista   3. Ändra uppgifter")
+    förnamn = felhantering.bokstav("Ange personens förnamn: ").title()
+    efternamn = felhantering.bokstav("Ange personens efternamn: ").title()
+    telefonnummer = str(felhantering.siffra("Ange personens telefonnummer: "))
+    telefonnummer = telefonnummer[:3] + "-" + telefonnummer[3:]
+    mail = input("Ange personens mail: ")
+    adress = input("Ange personens adress: ")
+
+    person = Person(förnamn, efternamn, telefonnummer, mail, adress)
+    personer.append(person)
+
+    with open("Register.txt", "a", encoding="utf-8") as fil:
+        fil.write(f"{person.förnamn};{person.efternamn};{person.telefonnummer};{person.mail};{person.adress}\n")
+
+def radera_personer(register, förnamn, efternamn):
+
+    vald_person = None
+
+    for person in register.personer:
+        if person.förnamn.lower() == förnamn.lower() and person.efternamn.lower() == efternamn.lower():
+            vald_person = person
+            break
+
+    if vald_person is None:
+        print("Ingen person som matchade din inmatning finns.")
+        return
+
+    val = input("Vill du radera personen?\n1. ja   2. nej: ")
 
     if val == "1":
-        sök_personer(start.personer)
+        register.personer.remove(vald_person)
+        with open("Register.txt", "w", encoding="utf-8") as fil:
+            for person in register.personer:
+
+                fil.write(f"{person.förnamn};{person.efternamn};{person.telefonnummer};{person.mail};{person.adress}\n")
+        print("Personen har raderats från registret.")
 
     elif val == "2":
-        skriv_studenter(start.personer)
-
-    elif val == "3":
-        ändra_uppgifter(start.personer)
-
+        print("Personen raderades inte.")
 
     else:
-        print("Hej då!")
+        print("Ogiltigt val.")
+
+def main():
+
+    while True:
+        try:
+            start = Register(input("Vad heter filen?: "))
+            break
+        except FileNotFoundError:
+            print("Filen kunde inte hittas, skriv in ny fil. ")
+
+    while True:
+        try:        
+            print("Vad vill du göra?")
+            val = input("1. Sök person   2. Skriv ut lista   3. Ändra uppgifter   4. Lägga till person   5. Radera person   6. Avsluta   ?. Hjälp: ")
+
+            if val == "1":
+                sökterm = input("Ange för/efternamn, telefonnummer eller mail: ")
+                sök_personer(start.personer, sökterm)
+
+            elif val == "2":
+                skriv_studenter(start.personer)
+
+            elif val == "3":
+                ändra_uppgifter(start)
+
+            elif val == "4":
+                lägga_till_personer(start.personer)
+
+            elif val == "5":
+                förnamn = felhantering.bokstav("Ange förnamn på personen: ")
+                efternamn = felhantering.bokstav("Ange efternamn på personen: ")
+                radera_personer(start, förnamn, efternamn)
+
+            elif val == "6":
+                print("Hej då :)")
+                break
+
+            elif val == "?":
+                print("När du får olika alternativ att välja mellan ska du alltid svara med en siffra som exempelvis, '3'")
+            
+            else:
+                print("Ogiltigt val")
+            
+        finally:
+            pass
 
 if __name__ == "__main__":
     main()
