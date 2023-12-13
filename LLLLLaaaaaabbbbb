@@ -86,11 +86,11 @@ def ändra_uppgifter(register):
     try:
         val = int(input("Ange en siffra 1 - 6: "))
         if 1 <= val <= 6:
-            ny_information = input("Uppdatera informationen: ")
             if val == 6:
                 return
-
-            elif val == 1:
+            
+            ny_information = input("Uppdatera informationen: ")
+            if val == 1:
                 vald_person.förnamn = ny_information.title()
             elif val == 2:
                 vald_person.efternamn = ny_information.title()
@@ -104,11 +104,9 @@ def ändra_uppgifter(register):
                 vald_person.adress = ny_information
 
             print("Informationen har ändrats.")
-        else:
-            print("Ogiltigt val.")
-            return
     except ValueError:
         print("Ogiltigt val.")
+        return ändra_uppgifter(register)
 
 def lägga_till_personer(register):
     """Funktionen frågar användaren efter all information om personen som ska in i listan som sedan läggs i variabeln 'person' som läggs in i listan under klassen Register"""
