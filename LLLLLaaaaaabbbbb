@@ -1,7 +1,8 @@
 import felhantering
 
 class Person:
-    header_printed = False
+    """Introducerar en class, Person, där man sparar förnamn, efternamn, telefonnummer, mail, adress i dem attributerna.
+    I klassen finns även en __str__ metod som formulerar hur våra prints kommer att se ut."""
 
     def __init__(self, förnamn, efternamn, telefonnummer, mail, adress):
         self.förnamn = förnamn
@@ -11,21 +12,17 @@ class Person:
         self.adress = adress
 
     def __str__(self):
-        if not Person.header_printed:
-            header = f"{'Förnamn':<15} {'Efternamn':<15} {'Telefonnummer':<15} {'Email':<30} {'Adress':<15}"
-            separator = "=" * 90
-            Person.header_printed = True
-            return f"{header}\n{separator}\n{self.förnamn:<15} {self.efternamn:<15} {self.telefonnummer:<15} {self.mail:<30} {self.adress:<15}"
-        else:
-            return f"{self.förnamn:<15} {self.efternamn:<15} {self.telefonnummer:<15} {self.mail:<30} {self.adress:<15}"
+        return f"{self.förnamn:<15} {self.efternamn:<15} {self.telefonnummer:<15} {self.mail:<30} {self.adress:<15}"
 
 class Register:
+    """Klassen, Register, skapar än tom lista 'personer' där objekten från en fil sparas ner."""
     def __init__(self, filnamn):
         self.filnamn = filnamn
-        self.personer = []  # Skapar en tom lista
+        self.personer = []
         self.läsafil()
 
     def läsafil(self):
+        """Läser in information från en inmatad fil och lagrar den informationen i person via klassen, Person."""
         with open(self.filnamn, "r", encoding="utf-8") as fil:
             for line in fil:
                 line = line.strip().split(";")
@@ -34,17 +31,38 @@ class Register:
                     person = Person(förnamn, efternamn, telefonnummer, mail, adress)
                     self.personer.append(person)
 
-def skriv_studenter(personer):
-    sorterad_lista = sorted(personer, key=lambda person: person.förnamn)
+def skriv_studenter(register):
+    """Läser av listan som skapades i klasserna och printar ut den sorterad efter förnamn."""
+    sorterad_lista = sorted(register, key=lambda person: person.förnamn) # Hittade key=lambda på stack overflow
     for person in sorterad_lista:
         print(person)
 
-def sök_personer(personer, sökterm):
+def välj_person(register):
+    """Funktionen tar in informationen, förnamn och efternamn till en viss person
+    Den kollar sedan igenom listan ifall det finns en match och returnerar den isåfall"""
+    förnamn = felhantering.bokstav("Ange förnamn på personen: ")
+    efternamn = felhantering.bokstav("Ange efternamn på personen: ")
     
+    vald_person = None
+
+    for person in register.personer:
+        if person.förnamn.lower() == förnamn.lower() and person.efternamn.lower() == efternamn.lower():
+            vald_person = person
+            break
+
+    if vald_person is None:
+        print("Ingen person som matchade din inmatning finns.")
+        return välj_person(register)
+    
+    return vald_person
+
+def sök_personer(register, sökterm):
+    """Ber användaren efter en 'sökterm' för att hitta objekt i listan från klasserna.
+    Skapar en tom lista som printar ut alla matchningar mellan sökterm och listan."""
     sökterm = sökterm.lower()
     samma_personer = []
 
-    for person in personer:
+    for person in register:
         samma_förnamn = sökterm in person.förnamn.lower()
         samma_efternamn = sökterm in person.efternamn.lower()
         samma_telefonnummer = sökterm in person.telefonnummer
@@ -55,36 +73,22 @@ def sök_personer(personer, sökterm):
 
     for person in samma_personer:
         print(person)
-
-    return samma_personer
+    if person not in samma_personer:
+        print("Personen finns inte i lista.")
 
 def ändra_uppgifter(register):
-    förnamn = felhantering.bokstav("Ange förnamn på personem: ")
-    efternamn = felhantering.bokstav("Ange efternamn på personen: ")
-
-    vald_person = None
-
-    for person in register.personer:
-        if person.förnamn.lower() == förnamn.lower() and person.efternamn.lower() == efternamn.lower():
-            vald_person = person
-            break
-
-    if vald_person is None:
-        print("Ingen person som matchade din inmatning finns.")
-        return
+    """Tar information från 'välj_person' och lagrar i en variabel 'vald_person' vars information ska ändras och läggas in i filen"""
+    vald_person = välj_person(register)
 
     print("Vad vill du ändra?:\n"
-          "1. Förnamn   2. Efternamn   3. Telefonnummer   4. Mail   5. Adress")
-
-    val = input("Ange en siffra 1 - 5: ")
+          "1. Förnamn   2. Efternamn   3. Telefonnummer   4. Mail   5. Adress   6. Ändra inget")
 
     try:
-        val = int(val)
-        if 1 <= val <= 5:
-            ny_information = input("Uppdatera informationen: ")
+        val = int(input("Ange en siffra 1 - 6: "))
+        if 1 <= val <= 6:
 
             if val == 1:
-                vald_person.förnamn = ny_information.title() # Hittade .title() functionen på youtube
+                vald_person.förnamn = ny_information.title()
             elif val == 2:
                 vald_person.efternamn = ny_information.title()
             elif val == 3:
@@ -95,24 +99,19 @@ def ändra_uppgifter(register):
                 vald_person.mail = ny_information
             elif val == 5:
                 vald_person.adress = ny_information
-            else:
-                print("Ogiltigt val.")
+            elif val == 6:
                 return
+            
+            ny_information = input("Uppdatera informationen: ")
+            print("Informationen har ändrats.")
         else:
             print("Ogiltigt val.")
             return
     except ValueError:
         print("Ogiltigt val.")
-        return
-    
-    with open("Register.txt", "w", encoding="utf-8") as fil:
-        for person in register.personer:
-            fil.write(f"{person.förnamn};{person.efternamn};{person.telefonnummer};{person.mail};{person.adress}\n")
 
-    print("Information har ändrats.")
-
-def lägga_till_personer(personer):
-
+def lägga_till_personer(register):
+    """Funktionen frågar användaren efter all information om personen som ska in i listan som sedan läggs i variabeln 'person' som läggs in i listan under klassen Register"""
     förnamn = felhantering.bokstav("Ange personens förnamn: ").title()
     efternamn = felhantering.bokstav("Ange personens efternamn: ").title()
     telefonnummer = str(felhantering.siffra("Ange personens telefonnummer: "))
@@ -121,42 +120,34 @@ def lägga_till_personer(personer):
     adress = input("Ange personens adress: ")
 
     person = Person(förnamn, efternamn, telefonnummer, mail, adress)
-    personer.append(person)
+    register.append(person)
+    
+    print("Personen är nu tillagd!")
 
-    with open("Register.txt", "a", encoding="utf-8") as fil:
-        fil.write(f"{person.förnamn};{person.efternamn};{person.telefonnummer};{person.mail};{person.adress}\n")
-
-def radera_personer(register, förnamn, efternamn):
-
-    vald_person = None
-
-    for person in register.personer:
-        if person.förnamn.lower() == förnamn.lower() and person.efternamn.lower() == efternamn.lower():
-            vald_person = person
-            break
-
-    if vald_person is None:
-        print("Ingen person som matchade din inmatning finns.")
-        return
+def radera_personer(register):
+    """Tar information från 'välj_person' och lagrar i en variabel 'vald_person' vars information ska raderas från filen"""
+    vald_person = välj_person(register)
 
     val = input("Vill du radera personen?\n1. ja   2. nej: ")
 
     if val == "1":
         register.personer.remove(vald_person)
-        with open("Register.txt", "w", encoding="utf-8") as fil:
-            for person in register.personer:
-
-                fil.write(f"{person.förnamn};{person.efternamn};{person.telefonnummer};{person.mail};{person.adress}\n")
-        print("Personen har raderats från registret.")
-
+        print("Personen kommer att raderas.")
     elif val == "2":
         print("Personen raderades inte.")
-
     else:
         print("Ogiltigt val.")
 
-def main():
+def skriv_över_information(register, filnamn):
+    """Skriver över informationen i filen med den uppdaterade informationen från registret."""
+    with open(filnamn, "w", encoding="utf-8") as fil:
+        for person in register.personer:
+            fil.write(f"{person.förnamn};{person.efternamn};{person.telefonnummer};{person.mail};{person.adress}\n")
 
+def main():
+    """Funktionen har två delar.
+    1. Ber användaren ange ett filnamn som då 'startar' själva programmet
+    2. Har en meny där användaren kan välja vilken del av programmet som ska användas"""
     while True:
         try:
             start = Register(input("Vad heter filen?: "))
@@ -183,11 +174,10 @@ def main():
                 lägga_till_personer(start.personer)
 
             elif val == "5":
-                förnamn = felhantering.bokstav("Ange förnamn på personen: ")
-                efternamn = felhantering.bokstav("Ange efternamn på personen: ")
-                radera_personer(start, förnamn, efternamn)
+                radera_personer(start)
 
             elif val == "6":
+                skriv_över_information(start, start.filnamn)
                 print("Hej då :)")
                 break
 
